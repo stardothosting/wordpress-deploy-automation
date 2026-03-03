@@ -1,6 +1,6 @@
-# WordPress Deploy Scripts
+# WordPress Automation Deploy Script
 
-Automated staging-to-production deploy for WordPress sites. Handles file sync, database migration, WooCommerce order preservation (legacy CSV and HPOS), Gravity Forms entry backup/restore, URL search-replace, and cache clearing.
+Automated staging-to-production deploy for WordPress / WooCommerce sites. Handles file sync, database migration, WooCommerce order preservation (legacy CSV and HPOS), Gravity Forms entry backup/restore, URL search-replace, and cache clearing.
 
 ## How It Works
 
