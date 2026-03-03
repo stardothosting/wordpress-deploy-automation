@@ -1,0 +1,31 @@
+# Global settings
+woocommerce_enable="${WOOCOMMERCE_ENABLE:-true}"
+woocommerce_hpos="${WOOCOMMERCE_HPOS:-true}"
+notification_email="${NOTIFICATION_EMAIL:-example@email.com}"
+alert_email="${ALERT_EMAIL:-example@email.com}"
+php="${PHP_BIN:-/usr/bin/php82}"
+galera_restart="${GALERA_RESTART:-false}"
+gform_entries="${GFORM_ENTRIES:-true}"
+wprocket="${WPROCKET:-false}"
+flyingpress="${FLYINGPRESS:-false}"
+
+# Staging
+staging_db_name="${STAGING_DB_NAME:-staging_db}"
+staging_db_user="${STAGING_DB_USER:-staging_user}"
+staging_db_password="${STAGING_DB_PASSWORD:-staging_pass}"
+staging_db_host="${STAGING_DB_HOST:-localhost}"
+staging_host="${STAGING_HOST:-staging.example.com}"
+staging_user="${STAGING_USER:-deploy}"
+source_dir="${SOURCE_DIR:-/var/www/staging.example.com/public_html}"
+wp_cli_staging="${WP_CLI_STAGING:-/usr/local/bin/wp}"
+
+# Production
+prod_db_name="${PROD_DB_NAME:-prod_db}"
+prod_db_user="${PROD_DB_USER:-prod_user}"
+prod_db_password="${PROD_DB_PASSWORD:-prod_pass}"
+prod_db_host="${PROD_DB_HOST:-localhost}"
+prod_db_backup_dir="${PROD_DB_BACKUP_DIR:-/home/push-backups}"
+destination_dir="${DESTINATION_DIR:-/var/www/example.com/public_html}"
+destination_user="${DESTINATION_USER:-deploy}"
+destination_host="${DESTINATION_HOST:-0.0.0.0}"
+wp_cli_prod="${WP_CLI_PROD:-/usr/bin/php82 -d error_reporting=E_ERROR /usr/local/bin/wp}"

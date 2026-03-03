@@ -1,4 +1,7 @@
-
-
-#Ignore vscode AI rules
+.phpunit.result.cache
+/.vscode
+.cursorrules
+.github/workflows
+.codacy
 .github/instructions/codacy.instructions.md
+.vscode
