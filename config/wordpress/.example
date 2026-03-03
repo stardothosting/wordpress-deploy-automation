@@ -1,4 +1,5 @@
 # Global settings
+use_sudo="${USE_SUDO:-true}"
 woocommerce_enable="${WOOCOMMERCE_ENABLE:-true}"
 woocommerce_hpos="${WOOCOMMERCE_HPOS:-true}"
 notification_email="${NOTIFICATION_EMAIL:-example@email.com}"

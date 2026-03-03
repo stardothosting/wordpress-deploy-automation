@@ -17,12 +17,12 @@ Automated staging-to-production deploy for WordPress / WooCommerce sites. Handle
 ## Prerequisites
 
 - **SSH keys**: The CI runner (or the machine executing the script) needs key-based SSH access to both staging and production hosts
-- **Deploy user**: A non-root user (default: `deploy`) with passwordless sudo on both hosts
+- **Deploy user**: A non-root user (default: `deploy`). If `use_sudo=true` in the config (default), the user needs passwordless sudo on both hosts
 - **WP-CLI** installed on both staging and production
 - **Remote tools**: `rsync`, `mysqldump`, `mysql`, `gzip`/`gunzip` available on the remote hosts
 - **Mail**: `mailx` or equivalent configured on the runner for notifications
 
-### Sudoers example
+### Sudoers example (only needed when `use_sudo=true`)
 
 ```
 deploy ALL=(ALL) NOPASSWD: /usr/bin/rsync, /usr/bin/mysqldump, /usr/bin/mysql, /usr/local/bin/wp, /usr/bin/php82, /usr/bin/mv, /usr/bin/rm, /usr/bin/find, /usr/bin/bash, /usr/bin/gunzip, /usr/bin/systemctl
