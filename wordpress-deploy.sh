@@ -66,7 +66,7 @@ urlencode() {
 
 # Pre-flight check on staging
 echo "Running pre-flight WordPress check on staging .."
-check_staging_health=`ssh -l $staging_user $staging_host "sudo ${wp_cli_staging} --path=\"${source_dir}\" eval 'echo \"OK\";' --allow-root" 2>&1`
+check_staging_health=`ssh -l $staging_user $staging_host "sudo ${wp_cli_staging} --path=\"${source_dir}\" eval 'echo \"OK\";'" 2>&1`
 sanity_check $? "Pre-flight check failed on staging : $check_staging_health"
 
 # Maintenance mode on
@@ -110,45 +110,45 @@ then
 
         # Export order protection data (line items + metadata)
         echo "Exporting order protection data for 80000+ orders.."
-        check_protection_export=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush export_protection --backup-dir=\"${prod_db_backup_dir}\" --allow-root'"`
+        check_protection_export=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush export_protection --backup-dir=\"${prod_db_backup_dir}\"'"`
         sanity_check $? "Error with order protection export on production : $check_protection_export"
     else 
         echo "Exporting all orders from production .."
-        check_export_orders=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush export --allow-root > ${prod_db_backup_dir}/orders_export_${currentdate}.csv'"`
+        check_export_orders=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush export > ${prod_db_backup_dir}/orders_export_${currentdate}.csv'"`
         sanity_check $? "Error with order export on production : $check_export_orders"
     fi
 
     # Gravity Forms: save entries
     if [ "$gform_entries" == "true" ]
     then
-        gform_ids=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" gf form form_list --active --sort_column=id --format=ids --allow-root | sed \"s/\s\+/\n/g\"'"`
+        gform_ids=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" gf form form_list --active --sort_column=id --format=ids | sed \"s/\s\+/\n/g\"'"`
 
         echo "Clearing out all entries for gravity forms on staging .."
-        check_gravity_clear=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" db query \"truncate wp_gf_entry;truncate wp_gf_entry_meta;\" --allow-root'"`
+        check_gravity_clear=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" db query \"truncate wp_gf_entry;truncate wp_gf_entry_meta;\"'"`
         sanity_check $? "Error with clearing out gravity form entries on staging : $check_gravity_clear"
 
         for obj0 in $(echo $gform_ids)
         do
             echo "Exporting form list id : $obj0"
-            ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" gf entry export $obj0 --dir=${prod_db_backup_dir} form_entries_${currentdate}_${obj0}.json --format=json --allow-root'"
+            ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" gf entry export $obj0 --dir=${prod_db_backup_dir} form_entries_${currentdate}_${obj0}.json --format=json'"
         done
     fi
 
     if [ "$woocommerce_hpos" == "false" ]
     then
         # Delete all orders from staging
-        order_count_check=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post list --post_type='shop_order' --format=ids --allow-root | sed \"s/\s\+/\n/g\" | wc -l'"`
+        order_count_check=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post list --post_type='shop_order' --format=ids | sed \"s/\s\+/\n/g\" | wc -l'"`
         if [ $order_count_check -ne 0 ] 
         then
             echo "Cleaning orders from staging .."
-            check_staging_order_clear=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post delete \\$(${wp_cli_staging} --path=\"${source_dir}\" post list --post_type=\"shop_order\" --format=ids --allow-root) --force --allow-root'"`
+            check_staging_order_clear=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post delete \\$(${wp_cli_staging} --path=\"${source_dir}\" post list --post_type=\"shop_order\" --format=ids) --force'"`
             sanity_check $? "Error with clearing out orders from staging : $check_staging_order_clear"
         fi
-		order_refunds_count_check=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post list --post_type='shop_order_refund' --format=ids --allow-root | sed \"s/\s\+/\n/g\" | wc -l'"`
+		order_refunds_count_check=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post list --post_type='shop_order_refund' --format=ids | sed \"s/\s\+/\n/g\" | wc -l'"`
 	    if [ $order_refunds_count_check -ne 0 ]
 	    then
 	        echo "Cleaning order refunds from staging .."
-	        check_staging_order_refund_clear=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post delete \\$(${wp_cli_staging} --path=\"${source_dir}\" post list --post_type=\"shop_order_refund\" --format=ids --allow-root) --force --allow-root'"`
+	        check_staging_order_refund_clear=`ssh -l $staging_user $staging_host sudo bash -c "'${wp_cli_staging} --path=\"${source_dir}\" post delete \\$(${wp_cli_staging} --path=\"${source_dir}\" post list --post_type=\"shop_order_refund\" --format=ids) --force'"`
 	        sanity_check $? "Error with clearing out orders from staging : $check_staging_order_refund_clear"
 	    fi
     fi
@@ -181,7 +181,7 @@ then
         for obj0 in $(echo $gform_ids)
         do
             echo "Importing form list id : $obj0"
-            ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" gf entry import $obj0 ${prod_db_backup_dir}/form_entries_${currentdate}_${obj0}.json --allow-root'"
+            ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" gf entry import $obj0 ${prod_db_backup_dir}/form_entries_${currentdate}_${obj0}.json'"
         done
     fi
 
@@ -196,17 +196,17 @@ then
         restore_script=`ssh -l $destination_user $destination_host sudo bash -c "'find ${prod_db_backup_dir} -name \"order_protection_restore_*.php\" -type f -printf \"%T@ %p\n\" | sort -n | tail -1 | cut -d\" \" -f2-'"`
         
         if [ ! -z "$restore_script" ]; then
-            check_protection_import=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush import_protection --restore-script=\"${restore_script}\" --allow-root'"`
+            check_protection_import=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush import_protection --restore-script=\"${restore_script}\"'"`
             sanity_check $? "Error with order protection import on production : $check_protection_import"
         else
             echo "Warning: No order protection restore script found"
         fi
 
         # Check for orphaned orders
-        ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush check_orphans --allow-root'"
+        ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush check_orphans'"
 	else
 	    echo "Importing all orders back to production .."
-	    check_import_orders=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush import --import-file=${prod_db_backup_dir}/orders_export_${currentdate}.csv --allow-root'"`
+	    check_import_orders=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" shift8wcpush import --import-file=${prod_db_backup_dir}/orders_export_${currentdate}.csv'"`
 	    sanity_check $? "Error with order import on production : $check_import_orders"
 	fi
 
@@ -218,7 +218,7 @@ then
     sanity_check $? "Error with running Wordpress cron on production : $check_wordpress_cron"
 
     echo "Running Wordpress action scheduler on production .."
-    check_wordpress_action_scheduler=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" action-scheduler run --allow-root'"`
+    check_wordpress_action_scheduler=`ssh -l $destination_user $destination_host sudo bash -c "'${wp_cli_prod} --path=\"${destination_dir}\" action-scheduler run'"`
     sanity_check $? "Error with running action scheduler on Wordpress on production : $check_wordpress_action_scheduler"
 
 fi
@@ -245,9 +245,9 @@ fi
 
 # URL search-replace staging -> production
 echo "Fixing URLs on production.."
-destination_siteurl=$(ssh -l $destination_user $destination_host "cd $destination_dir;sudo ${wp_cli_prod} option get siteurl --allow-root") 
+destination_siteurl=$(ssh -l $destination_user $destination_host "cd $destination_dir;sudo ${wp_cli_prod} option get siteurl") 
 destination_siteurl_encoded=$(urlencode "${destination_siteurl}")
-staging_siteurl=$(ssh -l $staging_user $staging_host "cd $source_dir;sudo ${wp_cli_staging} option get siteurl --allow-root")
+staging_siteurl=$(ssh -l $staging_user $staging_host "cd $source_dir;sudo ${wp_cli_staging} option get siteurl")
 staging_siteurl_encode=$(urlencode "${staging_siteurl}")
 
 echo "Staging site url : ${staging_siteurl}"
@@ -255,13 +255,13 @@ echo "Staging site url encode : ${staging_siteurl_encode}"
 echo "Destination site url encode : ${destination_siteurl_encoded}"
 echo "Destination site url : ${destination_siteurl}"
 
-echo "${wp_cli_prod} search-replace $staging_siteurl_encode $destination_siteurl_encode --allow-root --all-tables --precise;"
+echo "${wp_cli_prod} search-replace $staging_siteurl_encode $destination_siteurl_encode --all-tables --precise;"
 
 ssh -l $destination_user $destination_host \
     "cd $destination_dir;\
-    sudo ${wp_cli_prod} search-replace \"$staging_siteurl\" \"$destination_siteurl\" --allow-root --all-tables --precise;\
-    sudo ${wp_cli_prod} search-replace \"$staging_siteurl_encode\" \"$destination_siteurl_encode\" --allow-root --all-tables --precise;\
-    sudo ${wp_cli_prod} cache flush --allow-root"
+    sudo ${wp_cli_prod} search-replace \"$staging_siteurl\" \"$destination_siteurl\" --all-tables --precise;\
+    sudo ${wp_cli_prod} search-replace \"$staging_siteurl_encode\" \"$destination_siteurl_encode\" --all-tables --precise;\
+    sudo ${wp_cli_prod} cache flush"
 
 # Cache clearing
 if [ "$wprocket" == "true" ]
@@ -269,9 +269,9 @@ then
     echo "Clearing WP Rocket .."
 	ssh -l $destination_user $destination_host \
     	"cd $destination_dir;\
-		sudo ${wp_cli_prod} rocket clean --confirm --allow-root;\
-	    sudo ${wp_cli_prod} rocket preload --sitemap --allow-root;\
-	    sudo ${wp_cli_prod} rocket regenerate --file=config --nginx=true --allow-root;\
+		sudo ${wp_cli_prod} rocket clean --confirm;\
+	    sudo ${wp_cli_prod} rocket preload --sitemap;\
+	    sudo ${wp_cli_prod} rocket regenerate --file=config --nginx=true;\
         sudo rm -rf $destination_dir/wp-content/cache/*"
 fi
 
@@ -280,8 +280,8 @@ then
     echo "Clearing Flying press .."
     ssh -l $destination_user $destination_host \
         "cd $destination_dir;\
-        sudo ${wp_cli_prod} purge-everything --allow-root;\
-        sudo ${wp_cli_prod} preload-cache --allow-root"
+        sudo ${wp_cli_prod} purge-everything;\
+        sudo ${wp_cli_prod} preload-cache"
 fi
 
 # Maintenance mode off

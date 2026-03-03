@@ -208,4 +208,3 @@ All of these follow the same pattern: inject secrets as env vars, then call the 
 - The script SSH's into staging to initiate the rsync to production, so staging needs outbound SSH access to the production host.
 - Production database is backed up (full dump, gzipped) before any changes are made.
 - If a step fails, the script exits immediately, sends an email alert, and does **not** disable maintenance mode. This is intentional so you can investigate before the site goes live with a partial deploy.
-- The `--allow-root` flag on WP-CLI commands is required because commands are run via sudo.

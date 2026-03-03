@@ -5,3 +5,4 @@
 .codacy
 .github/instructions/codacy.instructions.md
 .vscode
+*.swp
